@@ -1,6 +1,6 @@
 // This file handles all API calls to your Spring Boot backend
 
-const API_BASE_URL = 'http://localhost:8080';
+const API_BASE_URL = 'http://localhost:8080/api/v1';
 
 const eventService = {
 
