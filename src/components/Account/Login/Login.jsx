@@ -1,25 +1,139 @@
 import {
+  Alert,
   Box,
   Button,
+  Collapse,
   Container,
   CssBaseline,
+  InputAdornment,
   TextField,
   Typography,
 } from "@mui/material";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import OtpInput from "react-otp-input";
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import authService from "../../Services/AuthService";
 import "./Login.css";
 
 function Login() {
+  const OTP_COUNTDOWN_SECONDS = 30;
+
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Handle login logic here
-    console.log("Email:", email);
-    console.log("otp:", otp);
+  const navigate = useNavigate();
+
+  // State to manage OTP status
+  const [otpSent, setOtpSent] = useState(false);
+  const [isSending, setIsSending] = useState(false); // To show loading
+
+  //Add state for your alert
+  const [alertInfo, setAlertInfo] = useState({
+    show: false,
+    severity: "success", // 'success', 'error', 'warning', 'info'
+    message: "",
+  });
+
+  const [countdown, setCountdown] = useState(0);
+
+  // Add useEffect to handle the timer logic
+  useEffect(() => {
+    // If countdown is 0, do nothing
+    if (countdown <= 0) return;
+
+    // Set a timer to decrease the countdown by 1
+    const timerId = setTimeout(() => {
+      setCountdown(countdown - 1);
+    }, 1000);
+
+    // This is a cleanup function:
+    // It clears the timer if the component unmounts or countdown changes
+    return () => clearTimeout(timerId);
+  }, [countdown]); // This effect runs whenever 'countdown' changes
+
+  const handleSendOtp = async () => {
+    setIsSending(true);
+    setAlertInfo({ show: false, message: "" }); // Clear any old alerts
+
+    try {
+      const response = await authService.sendOtp(email);
+
+      const isSuccess = response.data.success;
+
+      setAlertInfo({
+        show: true,
+        severity: isSuccess ? "success" : "error",
+        message:
+          response.data.message ||
+          (isSuccess
+            ? "An OTP has been sent to your email."
+            : "Failed to send OTP. Please try again."),
+      });
+
+      if (!isSuccess) {
+        return; // Stop here, don't show the OTP field
+      }
+
+      setOtpSent(true);
+
+      // Start the countdown on success
+      setCountdown(OTP_COUNTDOWN_SECONDS);
+    } catch (error) {
+      console.error(error);
+
+      // Set an error alert
+      setAlertInfo({
+        show: true,
+        severity: "error",
+        message: error.message || "Failed to send OTP. Please try again.",
+      });
+    } finally {
+      // 5. This runs whether it succeeds or fails
+      setIsSending(false);
+    }
+  };
+
+  const getSendOtpBtnText = () => {
+    if (isSending) return "Sending...";
+    if (countdown > 0) return `Resend in ${countdown}`;
+    if (otpSent) return "Resend OTP";
+    return "Send OTP";
+  };
+
+  const handleSubmit = async (event) => {
+    setAlertInfo({ show: false, message: "" }); // Clear any old alerts
+    event.preventDefault();
+
+    try {
+      const response = await authService.loginWithOtp(email, otp);
+
+      const isSuccess = response.data.success;
+
+      if (!isSuccess) {
+        setAlertInfo({
+          show: true,
+          severity: "error",
+          message:
+            response.data.message ||
+             "Error in authentication. Please try again.",
+        });
+      }else{
+        navigate('/all-events');
+      }
+
+      
+     
+    } catch (error) {
+      console.error(error);
+
+      // Set an error alert
+      setAlertInfo({
+        show: true,
+        severity: "error",
+        message: error.message || "Failed to login. Please try again.",
+      });
+    } 
   };
 
   // Define the style for each input box for OTP
@@ -57,6 +171,21 @@ function Login() {
             Enter your registered Tech Sisters email
           </Typography>
 
+          <Collapse
+            in={alertInfo.show} // Animation is controlled by this state
+            sx={{ width: "100%", mt: 2 }} // Style the wrapper
+          >
+            {alertInfo.show && (
+              <Alert
+                severity={alertInfo.severity}
+                sx={{ width: "100%", mt: 2 }}
+                onClose={() => setAlertInfo({ ...alertInfo, show: false })} // Optional: makes it dismissible
+              >
+                {alertInfo.message}
+              </Alert>
+            )}
+          </Collapse>
+
           <Box
             component="form"
             onSubmit={handleSubmit}
@@ -75,43 +204,62 @@ function Login() {
               autoFocus
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={otpSent} // Optionally disable email field after OTP is sent
               sx={{ mb: 3 }}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Button
+                      onClick={handleSendOtp}
+                      disabled={isSending || countdown > 0} // Disable if sending or already sent
+                    >
+                      {getSendOtpBtnText()}
+                    </Button>
+                  </InputAdornment>
+                ),
+              }}
             />
 
-            {/* --- Start of OTP Input --- */}
-            <div className="form-group mt-3">
-              <Typography
-                component="label"
-                variant="body2"
-              >
-                Enter the 6-digit OTP sent to your email
-              </Typography>
+            {/* === CONDITIONAL OTP FIELD === */}
 
-              <OtpInput
-                value={otp}
-                onChange={setOtp}
-                numInputs={6}
-                isInputNum={true}
-                shouldAutoFocus={true}
-                // This is the new required prop
-                renderInput={(props, index) => (
-                  <input
-                    {...props}
-                    style={inputStyle} // Apply your custom styles here
+            {/* This field only appears *after* the OTP is sent */}
+            {otpSent && (
+              <>
+                {/* --- Start of OTP Input --- */}
+                <div className="form-group mt-3">
+                  <Typography component="label" variant="body2">
+                    Enter the 6-digit OTP sent to your email
+                  </Typography>
+
+                  <OtpInput
+                    value={otp}
+                    onChange={setOtp}
+                    numInputs={6}
+                    isInputNum={true}
+                    shouldAutoFocus={true}
+                    // This is the new required prop
+                    renderInput={(props, index) => (
+                      <input
+                        {...props}
+                        style={inputStyle} // Apply your custom styles here
+                      />
+                    )}
                   />
-                )}
-              />
-            </div>
-            {/* --- End of OTP Input --- */}
+                </div>
+                {/* --- End of OTP Input --- */}
 
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              Sign In
-            </Button>
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  sx={{ mt: 3, mb: 2 }}
+                >
+                  Sign In
+                </Button>
+              </>
+            )}
+
+            {/* === END CONDITIONAL OTP FIELD === */}
           </Box>
         </Box>
       </Container>
