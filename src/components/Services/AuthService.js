@@ -30,6 +30,8 @@ const sendOtp = async (email) => {
   }
 };
 
+
+
 /**
  * Sends a POST request to verify the OTP and log the user in.
  * @param {string} email - The user's email address.
@@ -104,6 +106,12 @@ const isAuthenticated = () => {
 
 };
 
+const getUserEmail = () => {
+  return localStorage.getItem("email") || null;
+};
+
+
+
 /**
  * Removes the access token from localStorage to log the user out.
  */
@@ -122,6 +130,7 @@ const authService = {
   loginWithOtp,
   isAuthenticated,
   logout,
+  getUserEmail
 };
 
 export default authService;
