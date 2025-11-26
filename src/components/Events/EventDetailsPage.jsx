@@ -6,7 +6,10 @@ import {
   formatEventDateTime,
   getRelativeDate,
   getTimeUntilEvent,
+  getTimezoneAbbreviation,
 } from "../../utils/TimeZoneUtils";
+import "./EventDetailsPage.css";
+import { duration } from "@mui/material";
 
 export default function EventDetailsPage() {
   const { eventId } = useParams();
@@ -23,16 +26,15 @@ export default function EventDetailsPage() {
     async function loadEvent() {
       try {
         const res = await eventService.getEventById(eventId);
-        setEvent(res.dto);
+        const dto = res.dto || res.data || res; // defensive
+        setEvent(dto);
 
         const loggedInUser = authService.getUserEmail();
-        console.log("loggedInUser: ", loggedInUser);
-        console.log("createdBy: ", res.dto.createdBy);
-        if (loggedInUser && res.dto.createdBy === loggedInUser) {
+        if (loggedInUser && dto.createdBy === loggedInUser) {
           setIsCreator(true);
         }
 
-        setHasRSVPed(res.dto.currentUserRSVP || false);
+        setHasRSVPed(!!dto.currentUserRSVP);
       } catch (err) {
         console.error("Failed to load event", err);
       } finally {
@@ -51,7 +53,6 @@ export default function EventDetailsPage() {
     try {
       setRsvpLoading(true);
       const res = await eventService.rsvpToEvent(event.eventId, true);
-
       if (res.success) {
         setHasRSVPed(true);
         setMessage("RSVP successful!");
@@ -59,92 +60,165 @@ export default function EventDetailsPage() {
         setMessage(res.message || "Failed to RSVP");
       }
     } catch (err) {
-      setMessage("Error: " + err.message);
+      setMessage(err.message || "Failed to RSVP");
     } finally {
       setRsvpLoading(false);
-      setTimeout(() => setMessage(""), 3000);
+      setTimeout(() => setMessage(""), 2500);
     }
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (!event) return <div>Event not found</div>;
+  if (loading) return <div className="event-details-loading">Loading...</div>;
+  if (!event)
+    return <div className="event-details-loading">Event not found</div>;
 
+  // use your timezone helpers
   const { date, time } = formatEventDateTime(event.eventDateTime);
   const relativeDate = getRelativeDate(event.eventDateTime);
   const timeUntil = getTimeUntilEvent(event.eventDateTime);
+  const userTimeZone = getTimezoneAbbreviation();
   const isPastEvent = new Date(event.eventDateTime) < new Date();
 
+  const tags = (event.tags || "")
+    .split(",")
+    .map((t) => t.trim())
+    .filter(Boolean);
+
+  // sample price display (screenshot shows "Free")
+  const priceLabel = event.price || event.free ? "Free" : event.price || "Free";
+
+  // build share URL (optional)
+  const eventUrl = `${window.location.origin}/events/${event.eventId}`;
+
   return (
-    <div className="event-details-container">
-      {/* <button className="back-button" onClick={() => navigate(-1)}>
-        ← Back
-      </button> */}
+    <div className="event-details-page-root">
+      <div className="event-details-inner">
+        {/* LEFT COLUMN */}
+        <main className="event-left">
+          <h1 className="event-hero-title">{event.title}</h1>
 
-      <div className="event-details-header">
-        <h1 className="event-details-title">{event.title}</h1>
+          <div className="event-meta-row">
+            <div className="meta-item">
+              <span className="meta-icon">👤</span>
+              <span className="meta-text">
+                By <strong>{event.organizerEmail}</strong>
+              </span>
+            </div>
 
-        <span className="event-type-badge">
-          {event.eventType === "online" ? "🌐 Online" : "📍 In-Person"}
-        </span>
+            <div className="meta-item">
+              <span className="meta-icon">📍</span>
+              <span className="meta-text">
+                {event.eventLocation || "Online"}
+              </span>
+            </div>
+
+            <div className="meta-item">
+              <span className="meta-icon">📅</span>
+              <span className="meta-text">
+                {relativeDate} · {time} ({userTimeZone})
+              </span>
+            </div>
+            <div className="meta-item">
+              <span className="meta-icon">🕛</span>
+              <span className="meta-text">
+                {event.duration ? `${event.duration} mins` : "-"}
+              </span>
+            </div>
+          </div>
+
+          <hr className="separator" />
+
+          <section className="overview">
+            <h2 className="section-heading">Overview</h2>
+            <p className="overview-text">
+              {event.short_description || event.description || ""}
+            </p>
+
+            {/* long description if present */}
+            {event.long_description || event.longDescription ? (
+              <div className="long-description">
+                <p>{event.long_description || event.longDescription}</p>
+              </div>
+            ) : null}
+
+            <a
+              className="read-more-link"
+              onClick={() =>
+                window.scrollTo({
+                  top: document.body.scrollHeight,
+                  behavior: "smooth",
+                })
+              }
+            >
+              Read more
+            </a>
+
+            <div className="event-categories">
+              <span className="cat-label">Category:</span>
+              {tags.map((t, i) => (
+                <span
+                  key={i}
+                  className={`cat-pill ${
+                    i === tags.length - 1 ? "active" : ""
+                  }`}
+                >
+                  {t}
+                </span>
+              ))}
+            </div>
+          </section>
+        </main>
+
+        {/* RIGHT SIDEBAR */}
+        <aside className="event-right">
+          <div className="right-card simple-actions">
+            {isCreator && (
+              <button
+                className="action-btn edit-btn"
+                onClick={() => navigate(`/events/${event.eventId}/edit`)}
+              >
+                Edit Event
+              </button>
+            )}
+
+            <button
+              className="action-btn reserve-btn"
+              onClick={handleRSVP}
+              disabled={rsvpLoading || isPastEvent || hasRSVPed}
+            >
+              {rsvpLoading
+                ? "Processing..."
+                : hasRSVPed
+                ? "Reserved"
+                : "Reserve a spot"}
+            </button>
+
+            <button
+              className="action-btn share-btn"
+              onClick={async () => {
+                try {
+                  if (navigator.share) {
+                    await navigator.share({
+                      title: event.title,
+                      text: event.short_description || "",
+                      url: eventUrl,
+                    });
+                  } else {
+                    await navigator.clipboard.writeText(eventUrl);
+                    alert("Link copied to clipboard");
+                  }
+                } catch (err) {
+                  console.error("Share failed", err);
+                }
+              }}
+            >
+              Share Event
+            </button>
+          </div>
+        </aside>
       </div>
-      <div className="event-details-section">
-        <span className="event-details-label">Description</span>
-        <p className="event-details-text">{event.description}</p>
-      </div>
 
-      <div className="event-details-grid">
-        <div>
-          <span className="event-details-label">Date</span>
-          <p className="event-details-text">
-            {relativeDate} — {date}
-          </p>
-        </div>
-
-        <div>
-          <span className="event-details-label">Time</span>
-          <p className="event-details-text">{time}</p>
-        </div>
-      </div>
-
-      {!isPastEvent && (
-        <div className="time-until">
-          <span className="time-until-icon">⏳</span>
-          <span className="time-until-text">{timeUntil}</span>
-        </div>
-      )}
-
-      <div className="event-details-section">
-        <span className="event-details-label">Organizer</span>
-        <div className="organizer-box">{event.organizerEmail}</div>
-      </div>
-
-      {/* ACTION BUTTONS ROW */}
-      <div className="event-actions-row">
-        {/* Edit button - only for creator */}
-        {isCreator && (
-          <button
-            className="edit-button"
-            onClick={() => navigate(`/events/${eventId}/edit`)}
-          >
-            ✏ Edit Event
-          </button>
-        )}
-
-        {/* RSVP button (or confirmed badge) - only if not past */}
-        {!isPastEvent && !hasRSVPed && (
-          <button
-            className="rsvp-button"
-            onClick={handleRSVP}
-            disabled={rsvpLoading}
-          >
-            {rsvpLoading ? "RSVPing..." : "RSVP"}
-          </button>
-        )}
-
-        {hasRSVPed && <div className="rsvp-confirmed">✓ You're going!</div>}
-      </div>
-
-      {message && <div className="rsvp-message">{message}</div>}
+      {/* optional small message */}
+      {message && <div className="rsvp-message-global">{message}</div>}
     </div>
   );
 }
