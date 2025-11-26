@@ -24,80 +24,36 @@ function EventCard({ event }) {
   const [message, setMessage] = useState({ text: "", type: "" });
   const [hasRSVPed, setHasRSVPed] = useState(event.currentUserRSVP || false);
 
-  const handleCardClick = () => {
+  const handleViewDetails = (e) => {
+    e.stopPropagation(); // Prevent card click
     navigate(`/events/${event.eventId}`);
   };
 
-  // const handleRSVP = async () => {
-  //   // Check if user is logged in
-  //   if (!authService.isAuthenticated()) {
-  //     // Redirect to login page
-  //     navigate("/login");
-  //     return;
-  //   }
-  //   setLoading(true);
-  //   setMessage({ text: "", type: "" });
+  const handleShare = async (e) => {
+  e.stopPropagation(); // prevents card click
+  
+  const shareUrl = `${window.location.origin}/events/${event.eventId}`;
 
-  //   try {
-  //     const response = await eventService.rsvpToEvent(event.eventId, true);
-  //     if (response.success) {
-  //       setMessage({ text: "RSVP successful!", type: "success" });
-  //       setHasRSVPed(true);
-  //       setTimeout(() => {
-  //         setMessage({ text: "", type: "" });
-  //       }, 3000);
-  //     } else {
-  //       setMessage({
-  //         text: response.message || "Failed to RSVP",
-  //         type: "error",
-  //       });
-  //     }
-  //   } catch (error) {
-  //     console.error("Error submitting RSVP:", error);
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: event.title,
+        text: "Join this event on Gatherly!",
+        url: shareUrl,
+      });
+    } catch (error) {
+      console.log("Share canceled or failed:", error);
+    }
+  } else {
+    // Fallback for desktop
+    navigator.clipboard.writeText(shareUrl);
+    alert("Link copied to clipboard!");
+  }
+};
 
-  //     // Check if it's a duplicate RSVP error
-  //     if (
-  //       error.message.includes("already RSVPed") ||
-  //       error.message.includes("already RSVP")
-  //     ) {
-  //       setHasRSVPed(true);
-  //       setMessage({
-  //         text: "You've already RSVP'd to this event!",
-  //         type: "success",
-  //       });
-  //       setTimeout(() => {
-  //         setMessage({ text: "", type: "" });
-  //       }, 3000);
-  //     }
-
-  //     // Check if it's an authentication error
-  //     if (
-  //       error.message.includes("unauthorized") ||
-  //       error.message.includes("Session expired")
-  //     ) {
-  //       navigate("/login");
-  //     } else {
-  //       setMessage({
-  //         text: error.message || "Failed to RSVP. Please try again.",
-  //         type: "error",
-  //       });
-  //     }
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   return (
-    <div
-      className={`event-card ${isPastEvent ? "past-event" : ""}`}
-      onClick={handleCardClick}
-      style={{ cursor: "pointer" }}
-    >
-      {/* Event Type Badge */}
-      <div className="event-type-badge">
-        {event.eventType === "online" ? "🌐 Online" : "📍 In-Person"}
-      </div>
-
+    <div className={`event-card ${isPastEvent ? "past-event" : ""}`}>
       {/* Event Title */}
       <h3 className="event-title">{event.title}</h3>
 
@@ -114,12 +70,13 @@ function EventCard({ event }) {
           <span className="detail-icon">⏰</span>
           <span className="detail-text">{time}</span>
         </div>
-        {event.duration && (
-          <div className="detail-item">
-            <span className="detail-icon">⏱️</span>
-            <span className="detail-text">{event.duration} mins</span>
-          </div>
-        )}
+        {/* Event Type Badge */}
+        <div className="detail-item">
+          <span className="detail-icon">🌐</span>
+          <span className="detail-text">
+            {event.eventType === "online" ? " Online" : "📍 In-Person"}
+          </span>
+        </div>
       </div>
 
       {/* Timezone Info 
@@ -140,7 +97,7 @@ function EventCard({ event }) {
 
       {/* Organizer Info */}
       <div className="organizer-info">
-        <span className="organizer-label">Organized by:</span>
+        <span className="organizer-label">Hosted by:(replace with name)</span>
         <span className="organizer-email">{event.organizerEmail}</span>
       </div>
 
@@ -162,10 +119,11 @@ function EventCard({ event }) {
       <div className="event-footer">
         <div className="rsvp-count">
           <span className="rsvp-icon">👥</span>
-          <span>{event.allRSVPs || 0} attending</span>
+          <span>{event.allRSVPs || 0}</span>
         </div>
-        <button className="share-button" >
-          🔗 Share
+        <button className="share-button"  onClick={handleShare}>Share</button>
+        <button className="event-details-button" onClick={handleViewDetails}>
+          View Details
         </button>
       </div>
     </div>

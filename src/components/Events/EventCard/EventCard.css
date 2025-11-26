@@ -1,11 +1,11 @@
 /* Tech Sisters Color Palette */
 :root {
-  --ts-primary: #0F3363;      /* Dark blue - primary */
-  --ts-secondary: #4970A5;    /* Medium blue - secondary */
-  --ts-text: #747474;         /* Gray - text */
-  --ts-accent: #FBF1E8;       /* Beige - accent */
-  --ts-light-blue: #C2D7ED;   /* Light blue */
-  --ts-pink: #FDD9D9;         /* Light pink */
+  --ts-primary: #0f3363; /* Dark blue - primary */
+  --ts-secondary: #4970a5; /* Medium blue - secondary */
+  --ts-text: #747474; /* Gray - text */
+  --ts-accent: #fbf1e8; /* Beige - accent */
+  --ts-light-blue: #c2d7ed; /* Light blue */
+  --ts-pink: #fdd9d9; /* Light pink */
 }
 
 .event-card {
@@ -19,6 +19,8 @@
   gap: 18px;
   position: relative;
   border: 1px solid var(--ts-light-blue);
+  height: 100%; /* ensures equal height grid cards */
+  flex: 1; /* grow properly */
 }
 
 .event-card:hover {
@@ -38,7 +40,7 @@
   color: var(--ts-text);
 }
 
-.event-type-badge {
+/* .event-type-badge {
   position: absolute;
   top: 20px;
   right: 20px;
@@ -50,9 +52,9 @@
   font-weight: 600;
   font-family: "Poppins", sans-serif;
   box-shadow: 0 2px 8px rgba(15, 51, 99, 0.3);
-}
+} */
 
-.event-title {
+/* .event-title {
   color: var(--ts-primary);
   font-size: 1.6rem;
   font-weight: 700;
@@ -60,7 +62,7 @@
   margin: 0;
   padding-right: 120px;
   line-height: 1.3;
-}
+} */
 
 .event-description {
   color: #404040;
@@ -183,6 +185,7 @@
 }
 
 .event-footer {
+  margin-top: auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -288,9 +291,15 @@
   }
 
   .event-title {
-    font-size: 1.35rem;
-    padding-right: 100px;
-  }
+  color: var(--ts-primary);
+  font-size: 1.6rem;
+  font-weight: 700;
+  font-family: "Poppins", sans-serif;
+  margin: 0 0 8px 0;
+  line-height: 1.3;
+  width: 100%;       /* ensure full width */
+  padding-right: 0;  /* remove old restriction */
+}
 
   .event-details {
     flex-direction: column;
@@ -304,6 +313,68 @@
 
   .rsvp-button,
   .rsvp-confirmed {
+    width: 100%;
+  }
+}
+
+/* Shared button styling */
+.event-action-button {
+  padding: 12px 22px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  font-family: "Poppins", sans-serif;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* Share Button */
+.share-button {
+  background: white;
+  color: var(--ts-primary);
+  border: 2px solid var(--ts-light-blue);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: "Poppins", sans-serif;
+}
+
+.share-button:hover {
+  background: var(--ts-accent);
+  border-color: var(--ts-secondary);
+  color: var(--ts-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(15, 51, 99, 0.15);
+}
+
+/* View Details Button */
+.event-details-button {
+  background: var(--ts-primary);
+  color: white;
+  box-shadow: 0 4px 12px rgba(15, 51, 99, 0.25);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: "Poppins", sans-serif;
+}
+
+.event-details-button:hover {
+  background: var(--ts-secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(15, 51, 99, 0.35);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .share-button,
+  .event-details-button {
     width: 100%;
   }
 }
