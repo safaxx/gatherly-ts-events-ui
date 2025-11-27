@@ -1,10 +1,8 @@
 import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
-import { convertToUserTimezone } from "../../utils/TimeZoneUtils";
+import { convertToUserTimezone, getEventEnd } from "../../utils/TimeZoneUtils";
 import EventCard from "../Events/EventCard/EventCard";
 import eventService from "../Services/EventService";
-import { getEventEnd, convertToUserTimezone } from "../../utils/TimeZoneUtils";
-import { Search } from "lucide-react";
 
 function Dashboard() {
   const [allEvents, setAllEvents] = useState([]);
