@@ -13,7 +13,7 @@ function AddEventForm() {
   const location = useLocation();
   const [userTimezone, setUserTimezone] = useState(getUserTimezone());
   const [timezoneAbbr, setTimezoneAbbr] = useState("");
-
+  const loggedInEmail = localStorage.getItem("email");
   // Determine if we're editing based on URL params or location state
   const isEditMode = Boolean(eventId) || location.state?.event;
   const eventToEdit = location.state?.event;
@@ -26,7 +26,8 @@ function AddEventForm() {
     event_datetime: "",
     timezone: "",
     event_type: "online",
-    event_host_email: "",
+    event_link: "",
+    event_location: "",
     tags: "",
     duration: "",
   });
@@ -80,11 +81,12 @@ function AddEventForm() {
               title: eventData.title || "",
               short_description: eventData.shortDescription || "",
               long_description: eventData.longDescription || "",
-              organizer_email: eventData.organizerEmail || "",
+              organizer_email: loggedInEmail || "",
               event_datetime: localDateTime,
               timezone: eventData.timezone || userTimezone,
               event_type: eventData.eventType || "online",
-              event_host_email: eventData.eventHostEmail || "",
+              event_link: eventData.eventLink || "",
+              event_location: eventData.eventLocation || "",
               tags: eventData.tags || "",
               duration: eventData.duration || "",
             });
@@ -140,17 +142,16 @@ function AddEventForm() {
 
     try {
       const formattedData = {
-        title: formData.title,
-        short_description: formData.short_description,
-        long_description: formData.long_description,
-        organizer_email: formData.organizer_email,
+        ...formData,
         event_datetime: convertToISO8601(formData.event_datetime),
         timezone: userTimezone,
-        event_type: formData.event_type,
-        event_host_email: formData.event_host_email,
-        tags: formData.tags,
-        duration: formData.duration,
       };
+
+      if (formattedData.event_type === "online") {
+        formattedData.event_location = null;
+      } else if (formattedData.event_type === "in-person") {
+        formattedData.event_link = null;
+      }
 
       let response;
       if (isEditMode) {
@@ -230,8 +231,7 @@ function AddEventForm() {
             onChange={handleChange}
             required
             rows="4"
-            placeholder="Tell us about your event in short.
-            You can add more details later."
+            placeholder="Share a short intro about your event (you can add more details after creating it)."
           />
         </div>
         {isEditMode && (
@@ -248,21 +248,6 @@ function AddEventForm() {
           </div>
         )}
 
-        {/* Organizer Email */}
-        <div className="form-group">
-          <label htmlFor="organizer_email">Organizer Email</label>
-          <input
-            type="email"
-            id="organizer_email"
-            name="organizer_email"
-            value={formData.organizer_email}
-            onChange={handleChange}
-            required
-            placeholder="organizer@example.com"
-            disabled={isEditMode} // Can't change organizer when editing
-          />
-        </div>
-
         {/* Event Date & Time */}
         <div className="form-group">
           <label htmlFor="event_datetime">Event Date & Time</label>
@@ -275,7 +260,7 @@ function AddEventForm() {
             required
           />
           <small className="helper-text">
-            🌍 Time will be in your timezone: <strong>{timezoneAbbr}</strong> (
+           <strong>{timezoneAbbr}</strong> (
             {userTimezone})
           </small>
         </div>
@@ -297,6 +282,35 @@ function AddEventForm() {
             <option value="in-person">In-Person</option>
           </select>
         </div>
+
+        {/* Event Link / Location */}
+        {formData.event_type === "online" ? (
+          <div className="form-group">
+            <label htmlFor="event_link">Event Link (Online)</label>
+            <input
+              type="url"
+              id="event_link"
+              name="event_link"
+              value={formData.event_link}
+              onChange={handleChange}
+              placeholder="https://zoom.com/meeting (you can add this later also)"
+              
+            />
+          </div>
+        ) : (
+          <div className="form-group">
+            <label htmlFor="event_location">Event Location (In-Person)</label>
+            <input
+              type="text"
+              id="event_location"
+              name="event_location"
+              value={formData.event_location}
+              onChange={handleChange}
+              placeholder="123 Street, City, Country"
+              required
+            />
+          </div>
+        )}
 
         {/* Host Email */}
         <div className="form-group">
