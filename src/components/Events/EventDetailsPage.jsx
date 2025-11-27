@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import eventService from "../../components/Services/EventService";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import authService from "../../components/Services/AuthService";
+import eventService from "../../components/Services/EventService";
 import {
   formatEventDateTime,
   getRelativeDate,
   getTimeUntilEvent,
   getTimezoneAbbreviation,
 } from "../../utils/TimeZoneUtils";
+import GoogleCalendarEventButton from "../Account/GoogleAuth/GoogleCalendarEventButton";
 import "./EventDetailsPage.css";
-import { duration } from "@mui/material";
 
 export default function EventDetailsPage() {
   const { eventId } = useParams();
@@ -213,6 +213,12 @@ export default function EventDetailsPage() {
             >
               Share Event
             </button>
+
+            {authService.isAuthenticated() && (
+              <div >
+                <GoogleCalendarEventButton eventId={event.eventId} />
+              </div>
+            )}
           </div>
         </aside>
       </div>

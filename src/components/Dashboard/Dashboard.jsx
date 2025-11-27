@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
-import EventCard from "../Events/EventCard/EventCard";
-import "./Dashboard.css";
-import eventService from "../Services/EventService";
-import { convertToUserTimezone } from "../../utils/TimeZoneUtils";
 import { Search } from "lucide-react";
+import { useEffect, useState } from "react";
+import { convertToUserTimezone } from "../../utils/TimeZoneUtils";
+import EventCard from "../Events/EventCard/EventCard";
+import eventService from "../Services/EventService";
+import "./Dashboard.css";
 
 function Dashboard() {
   const [allEvents, setAllEvents] = useState([]);
