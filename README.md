@@ -23,7 +23,7 @@ With Gatherly, users can:
 - **Spring Boot (Java)** – Backend APIs  
 - **React.js** – Frontend interface  
 - **PostgreSQL** – Database  
-- **Hibernate / JPA** – ORM layer  
+- **Deployment** – Render
 
 ---
 
