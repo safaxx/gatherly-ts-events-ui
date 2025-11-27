@@ -44,5 +44,4 @@ Built with 💕 by **Tech Sisters**
 We’re working on:
 - RSVP tracking  
 - Smart reminders and notifications  
-- Shareable event links  
 - Calendar integration  
