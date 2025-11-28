@@ -122,8 +122,8 @@ function EventCard({ event }) {
 
       {/* Organizer Info */}
       <div className="organizer-info">
-        <span className="organizer-label">Hosted by:(replace with name)</span>
-        <span className="organizer-email">{event.organizerEmail}</span>
+        <span className="organizer-label">Host: </span>
+        <span className="organizer-email">{event.eventHostName}</span>
       </div>
 
       {/* Tags */}
