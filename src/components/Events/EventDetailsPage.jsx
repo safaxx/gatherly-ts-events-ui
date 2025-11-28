@@ -104,7 +104,7 @@ export default function EventDetailsPage() {
             <div className="meta-item">
               <span className="meta-icon">👤</span>
               <span className="meta-text">
-                By <strong>{event.organizerEmail}</strong>
+                By <strong>{event.eventHostName}</strong>
               </span>
             </div>
 
@@ -140,7 +140,7 @@ export default function EventDetailsPage() {
             {/* long description if present */}
             {event.long_description || event.longDescription ? (
               <div className="long-description">
-                <p>{event.long_description || event.longDescription}</p>
+                {event.long_description || event.longDescription}
               </div>
             ) : null}
 

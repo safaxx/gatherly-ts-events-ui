@@ -27,6 +27,8 @@ function AddEventForm() {
     timezone: "",
     event_type: "online",
     event_link: "",
+    event_host_name: "",
+    event_host_email: "",
     event_location: "",
     tags: "",
     duration: "",
@@ -87,6 +89,8 @@ function AddEventForm() {
               event_type: eventData.eventType || "online",
               event_link: eventData.eventLink || "",
               event_location: eventData.eventLocation || "",
+              event_host_name: eventData.eventHostName || "",
+              event_host_email: eventData.eventHostEmail || "",
               tags: eventData.tags || "",
               duration: eventData.duration || "",
             });
@@ -324,6 +328,18 @@ function AddEventForm() {
             placeholder="host@example.com"
           />
         </div>
+         <div className="form-group">
+            <label htmlFor="event_host_name">Event Host Name</label>
+            <input
+              type="text"
+              id="event_host_name"
+              name="event_host_name"
+              value={formData.event_host_name}
+              onChange={handleChange}
+              placeholder="Rayhana Rahman"
+              required
+            />
+          </div>
 
         {/* Duration */}
         <div className="form-group">
