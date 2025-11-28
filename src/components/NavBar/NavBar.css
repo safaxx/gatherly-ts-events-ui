@@ -66,6 +66,7 @@
 .topbar__link:hover {
   background: var(--ts-accent);
   color: var(--ts-primary);
+  border: 0.5px solid #0F3363;
 }
 
 .topbar__logout {

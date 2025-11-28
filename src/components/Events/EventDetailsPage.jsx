@@ -216,9 +216,7 @@ export default function EventDetailsPage() {
             </button>
 
             {authService.isAuthenticated() && (
-              <div >
-                <GoogleCalendarEventButton eventId={event.eventId} />
-              </div>
+              <GoogleCalendarEventButton eventId={event.eventId} />
             )}
           </div>
         </aside>
