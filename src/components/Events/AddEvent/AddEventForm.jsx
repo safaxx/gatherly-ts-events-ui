@@ -202,6 +202,40 @@ function AddEventForm() {
     }
   };
 
+  const handleDelete = async () => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this event? This action cannot be undone."
+    );
+
+    if (!confirmDelete) return;
+
+    setLoading(true);
+
+    try {
+      const response = await eventService.deleteEvent(eventId);
+
+      if (response.success) {
+        setMessage({ text: "Event deleted successfully 🗑️", type: "success" });
+
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 1200);
+      } else {
+        setMessage({
+          text: response.message || "Failed to delete event",
+          type: "error",
+        });
+      }
+    } catch (error) {
+      setMessage({
+        text: "Error: " + error.message,
+        type: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="create-event-container">
       <h2>{isEditMode ? "Edit Event ✏️" : "Create New Event 🌸"}</h2>
@@ -264,8 +298,7 @@ function AddEventForm() {
             required
           />
           <small className="helper-text">
-           <strong>{timezoneAbbr}</strong> (
-            {userTimezone})
+            <strong>{timezoneAbbr}</strong> ({userTimezone})
           </small>
         </div>
 
@@ -298,7 +331,6 @@ function AddEventForm() {
               value={formData.event_link}
               onChange={handleChange}
               placeholder="https://zoom.com/meeting (you can add this later also)"
-              
             />
           </div>
         ) : (
@@ -328,18 +360,18 @@ function AddEventForm() {
             placeholder="host@example.com"
           />
         </div>
-         <div className="form-group">
-            <label htmlFor="event_host_name">Event Host Name</label>
-            <input
-              type="text"
-              id="event_host_name"
-              name="event_host_name"
-              value={formData.event_host_name}
-              onChange={handleChange}
-              placeholder="Rayhana Rahman"
-              required
-            />
-          </div>
+        <div className="form-group">
+          <label htmlFor="event_host_name">Event Host Name</label>
+          <input
+            type="text"
+            id="event_host_name"
+            name="event_host_name"
+            value={formData.event_host_name}
+            onChange={handleChange}
+            placeholder="Rayhana Rahman"
+            required
+          />
+        </div>
 
         {/* Duration */}
         <div className="form-group">
@@ -370,6 +402,17 @@ function AddEventForm() {
         </div>
 
         <div className="form-actions">
+          {isEditMode && (
+            <button
+              type="button"
+              className="delete-button"
+              onClick={handleDelete}
+              disabled={isLoading}
+            >
+              Delete Event
+            </button>
+          )}
+
           <button
             type="button"
             className="cancel-button"
@@ -385,7 +428,7 @@ function AddEventForm() {
                 ? "Updating Event..."
                 : "Creating Event..."
               : isEditMode
-              ? "Update Event ✏️"
+              ? "Update Event"
               : "Create Event 🎉"}
           </button>
         </div>

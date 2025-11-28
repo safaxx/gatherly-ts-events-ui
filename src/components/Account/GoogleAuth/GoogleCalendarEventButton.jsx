@@ -16,16 +16,13 @@ const GoogleCalendarEventButton = ({ eventId }) => {
 
   return (
     <div style={{ textAlign: "center" }}>
-      <a href={fullConnectUrl} target="#" className="button-link">
+      <a href={fullConnectUrl} className="calendar-btn">
         <img
           src="/google-cal-logo.png"
-          alt="Google Calendar logo"
-          className="topbar__logo"
-        />{" "}
-        <div className="btn-calendar-text">
-            Google Calendar
-        </div>
-       
+          alt="Google Calendar"
+          className="calendar-logo"
+        />
+        <span>Add to Calendar</span>
       </a>
     </div>
   );
