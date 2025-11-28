@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
-import EventCard from "../Events/EventCard/EventCard";
-import "./Dashboard.css";
-import eventService from "../Services/EventService";
-import { getEventEnd, convertToUserTimezone } from "../../utils/TimeZoneUtils";
 import { Search } from "lucide-react";
+import { useEffect, useState } from "react";
+import { convertToUserTimezone, getEventEnd } from "../../utils/TimeZoneUtils";
+import EventCard from "../Events/EventCard/EventCard";
+import eventService from "../Services/EventService";
+import "./Dashboard.css";
 
 function Dashboard() {
   const [allEvents, setAllEvents] = useState([]);
@@ -44,7 +44,7 @@ function Dashboard() {
     const q = searchQuery.toLowerCase();
     return (
       event.title.toLowerCase().includes(q) ||
-      event.description.toLowerCase().includes(q) ||
+      event.shortDescription.toLowerCase().includes(q) ||
       (event.tags && event.tags.toLowerCase().includes(q))
     );
   };
