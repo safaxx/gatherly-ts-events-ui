@@ -2,6 +2,8 @@ import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { convertToUserTimezone, getEventEnd } from "../../utils/TimeZoneUtils";
 import EventCard from "../Events/EventCard/EventCard";
+
+import LoadingComponent from "../Loading/LoadingComponent";
 import eventService from "../Services/EventService";
 import "./Dashboard.css";
 
@@ -59,7 +61,8 @@ function Dashboard() {
       return activeTab === "upcoming"
         ? eventEnd >= now // still upcoming if end time is in future
         : eventEnd < now; // past only if end time is in past
-    }).filter(matchesSearch)
+    })
+    .filter(matchesSearch)
     .sort((a, b) => {
       const dateA = convertToUserTimezone(a.eventDateTime);
       const dateB = convertToUserTimezone(b.eventDateTime);
@@ -72,10 +75,7 @@ function Dashboard() {
   if (isLoading) {
     return (
       <div className="dashboard-container">
-        <div className="loading-state">
-          <div className="spinner"></div>
-          <p>Loading events...</p>
-        </div>
+        <LoadingComponent />
       </div>
     );
   }
