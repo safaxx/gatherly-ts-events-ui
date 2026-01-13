@@ -32,10 +32,12 @@ const VSignGirl = () => {
         display: "block",
         justifyContent: "center",
         alignItems: "center",
-        height: "105vh",
+        height: "124vh",
         position: "fixed",
         zIndex: 4,
-        marginRight: "17rem"
+        marginRight: "14rem",
+        transform: "scale(0.7)",
+        marginTop: "-2rem"
       }}
     >
       <motion.div

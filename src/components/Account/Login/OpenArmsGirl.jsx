@@ -32,9 +32,11 @@ const OpenArmsGirl = () => {
         display: "block",
         justifyContent: "center",
         alignItems: "center",
-        height: "105vh",
+        height: "128vh",
         position: "fixed",
         zIndex: 0,
+        transform: "scale(0.7)",
+        marginTop: "-2rem"
       }}
     >
       <motion.div

@@ -180,26 +180,27 @@ function Login() {
     margin: "0 4px", // Replaces the separator
   };
 
-  
   return (
-    
     <motion.div
       className="login-container"
       initial={{ opacity: 0, y: -50 }} // Starts transparent and 50px above
       animate={{ opacity: 1, y: 0 }} // Animates to full opacity at its original position
       transition={{ duration: 0.5 }} // Animation takes 0.5 seconds
     >
-     <VSignGirl />
-      <OpenArmsGirl />
-      <WavingGirl />
+     
+        <VSignGirl />
+        <OpenArmsGirl />
+        <WavingGirl />
+     
+
       <Container component="main" maxWidth="xs" className="login-form">
         <CssBaseline />
-        
+
         <Box
           sx={{
             display: "flex",
             flexDirection: "column",
-            alignItems: "center"
+            alignItems: "center",
           }}
         >
           <Typography component="h1" variant="h5">

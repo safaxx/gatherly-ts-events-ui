@@ -12,8 +12,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 110vh;
-  
+  min-height: 80vh;
+  margin-top: 4.5rem;
   padding: 20px;
 }
 
@@ -27,6 +27,7 @@
   box-sizing: border-box;
   border: 2px solid var(--ts-light-blue);
   z-index: 5;
+  position: fixed;
 }
 
 .login-form h2 {

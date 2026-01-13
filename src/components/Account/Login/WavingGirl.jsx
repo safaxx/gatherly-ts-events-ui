@@ -32,10 +32,12 @@ const WavingGirl = () => {
         display: "block",
         justifyContent: "center",
         alignItems: "center",
-        height: "115vh",
+        height: "135vh",
         position: "fixed",
         zIndex: 4,
-        marginLeft: "20rem"
+        marginLeft: "15rem",
+        transform: "scale(0.7)",
+        marginTop: "-2rem"
       }}
     >
       <motion.div
