@@ -51,6 +51,7 @@ const loginWithOtp = async (email, otp) => {
       localStorage.setItem('accessToken', response.data.accessToken);
       localStorage.setItem('name', response.data.name);
       localStorage.setItem('email', response.data.email);
+      localStorage.setItem('roles', response.data.roles);
       
     }
 
@@ -118,6 +119,7 @@ const logout = () => {
   localStorage.removeItem('accessToken');
   localStorage.removeItem('email');
   localStorage.removeItem('name');
+  localStorage.removeItem('roles');
   
   // Redirect to login page
   window.location.href = '/dashboard'; 

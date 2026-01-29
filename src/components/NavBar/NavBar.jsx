@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import authService from "../../components/Services/AuthService";
 import "./NavBar.css";
@@ -11,6 +11,11 @@ function NavBar() {
 
   const userName = localStorage.getItem("name");
   const userEmail = localStorage.getItem("email");
+
+  const userRoles = JSON.parse(localStorage.getItem("roles") || "[]");
+
+  // Check if user has admin role
+  const isAdmin = userRoles.includes("ROLE_ADMIN");
 
   const handleLogout = () => {
     authService.logout();
@@ -28,9 +33,12 @@ function NavBar() {
       </div>
 
       <nav className="topbar__nav">
-        <button className="topbar__link" onClick={() => nav("/create-event")}>
-          Create Event
-        </button>
+
+        {isAdmin && (
+          <button className="topbar__link" onClick={() => nav("/create-event")}>
+            Create Event
+          </button>
+        )}
 
         {isAuthed && (
           <button className="topbar__link" onClick={() => nav("/my-events")}>
