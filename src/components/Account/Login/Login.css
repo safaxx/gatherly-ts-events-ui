@@ -8,6 +8,19 @@
   --ts-pink: #FDD9D9;         /* Light pink */
 }
 
+
+/* Base styles (Desktop/Large Screens) */
+.characters-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  margin-top: 0.2rem;
+  padding: 20px;
+
+}
+
+
 .login-container {
   display: flex;
   justify-content: center;

@@ -187,11 +187,11 @@ function Login() {
       animate={{ opacity: 1, y: 0 }} // Animates to full opacity at its original position
       transition={{ duration: 0.5 }} // Animation takes 0.5 seconds
     >
-     
+     <div className="characters-container">
         <VSignGirl />
         <OpenArmsGirl />
         <WavingGirl />
-     
+     </div>
 
       <Container component="main" maxWidth="xs" className="login-form">
         <CssBaseline />
