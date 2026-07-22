@@ -44,11 +44,18 @@ function AddEventForm() {
       tags: "",
       duration: "",
       event_image: "",
+      is_recurring: false,
+      recurrence_frequency: "weekly",
+      recurrence_weekly_days: [],
+      recurrence_monthly_day: "",
+      recurrence_end_date: "",
     },
   });
 
   // Watch event_type to show/hide fields
   const eventType = watch("event_type");
+  const isRecurring = watch("is_recurring");
+  const recurrenceFrequency = watch("recurrence_frequency");
 
   const [isLoading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: "", type: "" });
@@ -129,6 +136,11 @@ function AddEventForm() {
               tags: eventData.tags || "",
               duration: eventData.duration || "",
               event_image: existingImage,
+              is_recurring: Boolean(eventData.recurrence?.enabled),
+              recurrence_frequency: eventData.recurrence?.frequency || "weekly",
+              recurrence_weekly_days: eventData.recurrence?.weeklyDays || [],
+              recurrence_monthly_day: eventData.recurrence?.monthlyDay || "",
+              recurrence_end_date: eventData.recurrence?.endDate || "",
             });
 
             setImagePreview(existingImage);
@@ -178,6 +190,30 @@ function AddEventForm() {
         timezone: userTimezone,
         imageUrl: data.event_image || "",
       };
+
+      if (data.is_recurring) {
+        formattedData.recurrence = {
+          enabled: true,
+          frequency: data.recurrence_frequency,
+          weeklyDays:
+            data.recurrence_frequency === "weekly"
+              ? data.recurrence_weekly_days || []
+              : [],
+          monthlyDay:
+            data.recurrence_frequency === "monthly"
+              ? Number(data.recurrence_monthly_day)
+              : null,
+          endDate: data.recurrence_end_date || null,
+        };
+      } else {
+        formattedData.recurrence = null;
+      }
+
+      delete formattedData.is_recurring;
+      delete formattedData.recurrence_frequency;
+      delete formattedData.recurrence_weekly_days;
+      delete formattedData.recurrence_monthly_day;
+      delete formattedData.recurrence_end_date;
 
       if (formattedData.event_type === "online") {
         formattedData.event_location = null;
@@ -332,6 +368,105 @@ function AddEventForm() {
 
         {/* Timezone - Hidden */}
         <input type="hidden" {...register("timezone")} />
+
+        <div className="form-group form-group--full recurrence-section">
+          <label className="recurrence-toggle">
+            <input type="checkbox" {...register("is_recurring")} />
+            <span>Make this a recurring event</span>
+          </label>
+
+          {isRecurring && (
+            <div className="recurrence-fields">
+              <div className="form-group">
+                <label htmlFor="recurrence_frequency">Repeats</label>
+                <select
+                  id="recurrence_frequency"
+                  {...register("recurrence_frequency")}
+                >
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                </select>
+              </div>
+
+              {recurrenceFrequency === "weekly" && (
+                <div className="form-group recurrence-days-group">
+                  <span className="recurrence-field-label">Repeat on</span>
+                  <div className="recurrence-days">
+                    {[
+                      ["MONDAY", "Mon"],
+                      ["TUESDAY", "Tue"],
+                      ["WEDNESDAY", "Wed"],
+                      ["THURSDAY", "Thu"],
+                      ["FRIDAY", "Fri"],
+                      ["SATURDAY", "Sat"],
+                      ["SUNDAY", "Sun"],
+                    ].map(([value, label]) => (
+                      <label className="recurrence-day" key={value}>
+                        <input
+                          type="checkbox"
+                          value={value}
+                          {...register("recurrence_weekly_days", {
+                            validate: (selectedDays) =>
+                              recurrenceFrequency !== "weekly" ||
+                              selectedDays?.length > 0 ||
+                              "Select at least one day",
+                          })}
+                        />
+                        <span>{label}</span>
+                      </label>
+                    ))}
+                  </div>
+                  {errors.recurrence_weekly_days && (
+                    <span className="error-message">
+                      {errors.recurrence_weekly_days.message}
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {recurrenceFrequency === "monthly" && (
+                <div className="form-group">
+                  <label htmlFor="recurrence_monthly_day">Day of month</label>
+                  <input
+                    type="number"
+                    id="recurrence_monthly_day"
+                    min="1"
+                    max="31"
+                    placeholder="e.g., 10"
+                    {...register("recurrence_monthly_day", {
+                      validate: (value) => {
+                        if (recurrenceFrequency !== "monthly") return true;
+                        if (!value) return "Day of month is required";
+                        const day = Number(value);
+                        return (
+                          (day >= 1 && day <= 31) ||
+                          "Enter a day between 1 and 31"
+                        );
+                      },
+                    })}
+                  />
+                  {errors.recurrence_monthly_day && (
+                    <span className="error-message">
+                      {errors.recurrence_monthly_day.message}
+                    </span>
+                  )}
+                </div>
+              )}
+
+              <div className="form-group">
+                <label htmlFor="recurrence_end_date">Ends on (optional)</label>
+                <input
+                  type="date"
+                  id="recurrence_end_date"
+                  {...register("recurrence_end_date")}
+                />
+                <small className="helper-text">
+                  Leave empty if the event should keep repeating.
+                </small>
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Event Type */}
         <div className="form-group">
