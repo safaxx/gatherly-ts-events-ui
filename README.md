@@ -1,4 +1,4 @@
-# 🌸 Tech Sisters Events Portal
+# Tech Sisters Events Portal
 
 TS Events is a simple and modern event management tool built to make organizing global events effortless and fun. 
 Whether it’s a small meetup or a large community gathering, Gatherly helps you create, manage, and share events with ease
