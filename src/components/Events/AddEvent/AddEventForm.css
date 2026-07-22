@@ -266,6 +266,80 @@
   padding-right: 34px;
 }
 
+.recurrence-section {
+  padding: 16px;
+  border: 1px solid rgba(60, 80, 125, 0.16);
+  border-radius: 14px;
+  background: rgba(245, 240, 233, 0.45);
+}
+
+.recurrence-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 0;
+  cursor: pointer;
+}
+
+.recurrence-toggle input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--ts-primary);
+}
+
+.recurrence-fields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.recurrence-days-group {
+  grid-column: span 2;
+}
+
+.recurrence-field-label {
+  margin-bottom: 6px;
+  color: var(--ts-primary);
+  font-weight: 600;
+  font-size: 14px;
+  font-family: "Poppins", sans-serif;
+}
+
+.recurrence-days {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.recurrence-day input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.recurrence-day span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  padding: 9px 12px;
+  border: 1.5px solid rgba(73, 112, 165, 0.4);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ts-primary);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.recurrence-day input:checked + span {
+  background: var(--ts-primary);
+  border-color: var(--ts-primary);
+  color: #fff;
+}
+
 @media (min-width: 1024px) {
   .event-form--create {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -306,6 +380,14 @@
 
   .form-actions {
     flex-direction: column;
+  }
+
+  .recurrence-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .recurrence-days-group {
+    grid-column: auto;
   }
 
   .submit-button,
